@@ -10,8 +10,8 @@ from itertools import combinations
 #     filename = sys.argv[1]
 # else:
 #     sys.exit("Usage: python " + sys.argv[0] + " [matrix filename]")
-x = [0, 50, 150, 200, 250, 300, 350, 400, 450, 500]
-y = [0, 10, 28, 42, 59, 51, 73, 85, 104, 96]
+x = []
+y = []
 #x, y must be one-dimensional arrays of the same length
 #Pearson algorithm
 def pearson(x, y):
@@ -52,6 +52,17 @@ def kendall(x, y):
 # with open(filename) as f:
 #     map(split_values, f.readlines())
 
+
+# spearman-rank.py
+
+def sort_a(text,list):
+    with open(text) as a:
+        for i in a.readlines():
+            if '"if":' in i:
+                list.append((float(i[14:-1])))
+sort_a("../src/outdir2/did-38.TC.json",x)
+sort_a("../src/outdir768/did-38.TC.json",y)
+
 print('Pearson Rho: %f' % pearson(x, y))
 
 print('Spearman Rho: %f' % spearman(x, y))
@@ -59,83 +70,83 @@ print('Spearman Rho: %f' % spearman(x, y))
 print('Kendall Tau: %f' % kendall(x, y))
 
 
-# spearman-rank.py
+def spear():
+    # set critical values
+    CRIT_VALUES = {5: 1.000,
+                   6: 0.886,
+                   7: 0.786,
+                   8: 0.738,
+                   9: 0.700,
+                   10: 0.648,
+                   11: 0.618,
+                   12: 0.587,
+                   13: 0.560,
+                   14: 0.538,
+                   15: 0.521,
+                   16: 0.503,
+                   17: 0.488,
+                   18: 0.472,
+                   19: 0.460,
+                   20: 0.447,
+                   21: 0.436,
+                   22: 0.425,
+                   23: 0.416,
+                   24: 0.407,
+                   25: 0.398,
+                   26: 0.390,
+                   27: 0.383,
+                   28: 0.375,
+                   29: 0.368,
+                   30: 0.362}
 
-# set critical values
-CRIT_VALUES = { 5:  1.000,
-				6:  0.886,
-				7:  0.786,
-				8:  0.738,
-				9:  0.700,
-				10: 0.648,
-				11: 0.618,
-				12: 0.587,
-				13: 0.560,
-				14: 0.538,
-				15: 0.521,
-				16: 0.503,
-				17: 0.488,
-				18: 0.472,
-				19: 0.460,
-				20: 0.447,
-				21: 0.436,
-				22: 0.425,
-				23: 0.416,
-				24: 0.407,
-				25: 0.398,
-				26: 0.390,
-				27: 0.383,
-				28: 0.375,
-				29: 0.368,
-				30: 0.362 }
+    # the data sets to be ranked
+    set_1 = []
+    set_2 = []
+    sort_a("../src/outdir2/did-38.TC.json", set_1)
+    sort_a("../src/outdir768/did-38.TC.json", set_2)
+    # order the sets
+    set_1_ord = sorted(set_1)
+    set_2_ord = sorted(set_2)
 
-# the data sets to be ranked
-set_1 = [0, 50, 150, 200, 250, 300, 350, 400, 450, 500]
-set_2 = [0, 10, 28, 42, 59, 51, 73, 85, 104, 96]
+    # append relevant rank to each value in set
+    set_1_ranked = []
+    set_2_ranked = []
+    # 写出在原来的数据每个数据在排序后的序列
+    for i in range(len(set_1)):
+        set_1_ranked.append([set_1[i], set_1_ord.index(set_1[i]) + 1])
 
-# order the sets
-set_1_ord = sorted(set_1)
-set_2_ord = sorted(set_2)
+    for i in range(len(set_2)):
+        set_2_ranked.append([set_2[i], set_2_ord.index(set_2[i]) + 1])
 
-# append relevant rank to each value in set
-set_1_ranked = []
-set_2_ranked = []
-#写出在原来的数据每个数据在排序后的序列
-for i in range(len(set_1)):
-    set_1_ranked.append([set_1[i], set_1_ord.index(set_1[i])+1])
+    print(set_1_ranked)
+    print(set_2_ranked)
 
-for i in range(len(set_2)):
-    set_2_ranked.append([set_2[i], set_2_ord.index(set_2[i])+1])
+    # calculate d
+    d = []
+    for i in range(len(set_1_ranked)):
+        d.append(set_1_ranked[i][1] - set_2_ranked[i][1])
+    print(d)
 
-print(set_1_ranked)
-print(set_2_ranked)
+    # calculate d^2
+    d_sq = [i ** 2 for i in d]
+    print(d_sq)
 
-# calculate d
-d = []
-for i in range(len(set_1_ranked)):
-    d.append(set_1_ranked[i][1] - set_2_ranked[i][1])
-print(d)
+    # sum d^2
+    sum_d_sq = sum(d_sq)
+    print(sum_d_sq)
 
-# calculate d^2
-d_sq = [i**2 for i in d]
-print(d_sq)
+    # calculate n^3 - n
+    n_cu_min_n = len(set_1) ** 3 - len(set_1)
+    print(n_cu_min_n)
 
-# sum d^2
-sum_d_sq = sum(d_sq)
-print(sum_d_sq)
+    # calculate r
+    r = 1 - ((6.0 * sum_d_sq) / n_cu_min_n)
+    print(r)
 
-# calculate n^3 - n
-n_cu_min_n = len(set_1)**3 - len(set_1)
-print(n_cu_min_n)
+    critical = CRIT_VALUES[len(set_1)]
 
-# calculate r
-r = 1 - ((6.0*sum_d_sq)/n_cu_min_n)
-print(r)
-
-critical = CRIT_VALUES[len(set_1)]
-
-# compare r to relevant critical value
-if r > critical:
-    print('significant correlation')
+    # compare r to relevant critical value
+    # if r > critical:
+    #     print('significant correlation')
 
 
