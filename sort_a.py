@@ -24,7 +24,7 @@ def sort_a(text):#i biaoshi how many json? jbiaoshi how many if?
             r.write(json.dumps(sorted(s.items(),key=lambda x:x[1]))+"\n")
 
 sort_a("outdir2/did-38.TC.json")
-sort_a("outdir2/did-38.TC.json")
+sort_a("outdir768/did-38.TC.json")
 
 list2=[[],[]]
 for i in list1[0]:
